@@ -1,0 +1,4 @@
+code,name,descr
+DRF,Draft,Escalation not yet sent to the vendor
+INP,In Progress,Escalation sent to vendor
+CMP,Resolved,Escalation is closed

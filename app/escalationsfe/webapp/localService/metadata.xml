@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Capabilities.V1.xml">
+        <edmx:Include Alias="Capabilities" Namespace="Org.OData.Capabilities.V1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="EscalationManagementService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="Escalations" EntityType="EscalationManagementService.Escalations">
+                    <NavigationPropertyBinding Path="purchaseOrder" Target="PurchaseOrders"/>
+                    <NavigationPropertyBinding Path="status" Target="Statuses"/>
+                    <NavigationPropertyBinding Path="comments" Target="Comments"/>
+                </EntitySet>
+                <EntitySet Name="Comments" EntityType="EscalationManagementService.Comments">
+                    <NavigationPropertyBinding Path="escalation" Target="Escalations"/>
+                </EntitySet>
+                <EntitySet Name="Statuses" EntityType="EscalationManagementService.Statuses">
+                    <NavigationPropertyBinding Path="texts" Target="Statuses_texts"/>
+                    <NavigationPropertyBinding Path="localized" Target="Statuses_texts"/>
+                </EntitySet>
+                <EntitySet Name="PurchaseOrders" EntityType="EscalationManagementService.PurchaseOrders"/>
+                <EntitySet Name="Statuses_texts" EntityType="EscalationManagementService.Statuses_texts"/>
+            </EntityContainer>
+            <EntityType Name="Escalations">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="description" Type="Edm.String" MaxLength="80"/>
+                <Property Name="material" Type="Edm.String" MaxLength="30"/>
+                <NavigationProperty Name="purchaseOrder" Type="EscalationManagementService.PurchaseOrders">
+                    <ReferentialConstraint Property="purchaseOrder_ID" ReferencedProperty="ID"/>
+                </NavigationProperty>
+                <Property Name="purchaseOrder_ID" Type="Edm.String" MaxLength="10"/>
+                <Property Name="expectedDate" Type="Edm.Date"/>
+                <NavigationProperty Name="status" Type="EscalationManagementService.Statuses">
+                    <ReferentialConstraint Property="status_code" ReferencedProperty="code"/>
+                </NavigationProperty>
+                <Property Name="status_code" Type="Edm.String" MaxLength="3"/>
+                <NavigationProperty Name="comments" Type="Collection(EscalationManagementService.Comments)" Partner="escalation">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="Comments">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="comment" Type="Edm.String"/>
+                <NavigationProperty Name="escalation" Type="EscalationManagementService.Escalations" Partner="comments">
+                    <ReferentialConstraint Property="escalation_ID" ReferencedProperty="ID"/>
+                </NavigationProperty>
+                <Property Name="escalation_ID" Type="Edm.Guid"/>
+            </EntityType>
+            <EntityType Name="Statuses">
+                <Key>
+                    <PropertyRef Name="code"/>
+                </Key>
+                <Property Name="name" Type="Edm.String" MaxLength="255"/>
+                <Property Name="descr" Type="Edm.String" MaxLength="1000"/>
+                <Property Name="code" Type="Edm.String" MaxLength="3" Nullable="false"/>
+                <NavigationProperty Name="texts" Type="Collection(EscalationManagementService.Statuses_texts)">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="localized" Type="EscalationManagementService.Statuses_texts">
+                    <ReferentialConstraint Property="code" ReferencedProperty="code"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="PurchaseOrders">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" Nullable="false"/>
+                <Property Name="PurchaseOrderType" Type="Edm.String" MaxLength="4"/>
+                <Property Name="Supplier" Type="Edm.String" MaxLength="10"/>
+                <Property Name="SupplierPhoneNumber" Type="Edm.String" MaxLength="16"/>
+            </EntityType>
+            <EntityType Name="Statuses_texts">
+                <Key>
+                    <PropertyRef Name="locale"/>
+                    <PropertyRef Name="code"/>
+                </Key>
+                <Property Name="locale" Type="Edm.String" MaxLength="14" Nullable="false"/>
+                <Property Name="name" Type="Edm.String" MaxLength="255"/>
+                <Property Name="descr" Type="Edm.String" MaxLength="1000"/>
+                <Property Name="code" Type="Edm.String" MaxLength="3" Nullable="false"/>
+            </EntityType>
+            <Action Name="resolve" IsBound="true">
+                <Parameter Name="in" Type="EscalationManagementService.Escalations"/>
+            </Action>
+            <Annotations Target="EscalationManagementService.Escalations/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="{i18n>CreatedAt}"/>
+                </Annotations>
+                <Annotations Target="EscalationManagementService.Escalations/createdBy">
+                    <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                    <Annotation Term="Core.Immutable" Bool="true"/>
+                    <Annotation Term="Core.Computed" Bool="true"/>
+                    <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+                        <Annotation Term="Common.Label" String="{i18n>CreatedBy}"/>
+                        </Annotations>
+                        <Annotations Target="EscalationManagementService.Escalations/modifiedAt">
+                            <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                            <Annotation Term="Core.Computed" Bool="true"/>
+                            <Annotation Term="Common.Label" String="{i18n>ChangedAt}"/>
+                            </Annotations>
+                            <Annotations Target="EscalationManagementService.Escalations/modifiedBy">
+                                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                                <Annotation Term="Core.Computed" Bool="true"/>
+                                <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+                                    <Annotation Term="Common.Label" String="{i18n>ChangedBy}"/>
+                                    </Annotations>
+                                    <Annotations Target="EscalationManagementService.Escalations/status_code">
+                                        <Annotation Term="Common.ValueList">
+                                            <Record Type="Common.ValueListType">
+                                                <PropertyValue Property="Label" String="Statuses"/>
+                                                <PropertyValue Property="CollectionPath" String="Statuses"/>
+                                                <PropertyValue Property="Parameters">
+                                                    <Collection>
+                                                        <Record Type="Common.ValueListParameterInOut">
+                                                            <PropertyValue Property="LocalDataProperty" PropertyPath="status_code"/>
+                                                            <PropertyValue Property="ValueListProperty" String="code"/>
+                                                        </Record>
+                                                        <Record Type="Common.ValueListParameterDisplayOnly">
+                                                            <PropertyValue Property="ValueListProperty" String="name"/>
+                                                        </Record>
+                                                    </Collection>
+                                                </PropertyValue>
+                                            </Record>
+                                        </Annotation>
+                                    </Annotations>
+                                    <Annotations Target="EscalationManagementService.Comments/createdAt">
+                                        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                                        <Annotation Term="Core.Immutable" Bool="true"/>
+                                        <Annotation Term="Core.Computed" Bool="true"/>
+                                        <Annotation Term="Common.Label" String="{i18n>CreatedAt}"/>
+                                        </Annotations>
+                                        <Annotations Target="EscalationManagementService.Comments/createdBy">
+                                            <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                                            <Annotation Term="Core.Immutable" Bool="true"/>
+                                            <Annotation Term="Core.Computed" Bool="true"/>
+                                            <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+                                                <Annotation Term="Common.Label" String="{i18n>CreatedBy}"/>
+                                                </Annotations>
+                                                <Annotations Target="EscalationManagementService.Comments/modifiedAt">
+                                                    <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                                                    <Annotation Term="Core.Computed" Bool="true"/>
+                                                    <Annotation Term="Common.Label" String="{i18n>ChangedAt}"/>
+                                                    </Annotations>
+                                                    <Annotations Target="EscalationManagementService.Comments/modifiedBy">
+                                                        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                                                        <Annotation Term="Core.Computed" Bool="true"/>
+                                                        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+                                                            <Annotation Term="Common.Label" String="{i18n>ChangedBy}"/>
+                                                            </Annotations>
+                                                            <Annotations Target="EscalationManagementService.Statuses">
+                                                                <Annotation Term="UI.Identification">
+                                                                    <Collection>
+                                                                        <Record Type="UI.DataField">
+                                                                            <PropertyValue Property="Value" Path="name"/>
+                                                                        </Record>
+                                                                    </Collection>
+                                                                </Annotation>
+                                                            </Annotations>
+                                                            <Annotations Target="EscalationManagementService.Statuses/name">
+                                                                <Annotation Term="Common.Label" String="{i18n>Name}"/>
+                                                                </Annotations>
+                                                                <Annotations Target="EscalationManagementService.Statuses/descr">
+                                                                    <Annotation Term="Common.Label" String="{i18n>Description}"/>
+                                                                    </Annotations>
+                                                                    <Annotations Target="EscalationManagementService.EntityContainer/PurchaseOrders">
+                                                                        <Annotation Term="Capabilities.DeleteRestrictions">
+                                                                            <Record Type="Capabilities.DeleteRestrictionsType">
+                                                                                <PropertyValue Property="Deletable" Bool="false"/>
+                                                                            </Record>
+                                                                        </Annotation>
+                                                                        <Annotation Term="Capabilities.InsertRestrictions">
+                                                                            <Record Type="Capabilities.InsertRestrictionsType">
+                                                                                <PropertyValue Property="Insertable" Bool="false"/>
+                                                                            </Record>
+                                                                        </Annotation>
+                                                                        <Annotation Term="Capabilities.UpdateRestrictions">
+                                                                            <Record Type="Capabilities.UpdateRestrictionsType">
+                                                                                <PropertyValue Property="Updatable" Bool="false"/>
+                                                                            </Record>
+                                                                        </Annotation>
+                                                                    </Annotations>
+                                                                    <Annotations Target="EscalationManagementService.Statuses_texts/locale">
+                                                                        <Annotation Term="Common.Label" String="{i18n>LanguageCode}"/>
+                                                                        </Annotations>
+                                                                        <Annotations Target="EscalationManagementService.Statuses_texts/name">
+                                                                            <Annotation Term="Common.Label" String="{i18n>Name}"/>
+                                                                            </Annotations>
+                                                                            <Annotations Target="EscalationManagementService.Statuses_texts/descr">
+                                                                                <Annotation Term="Common.Label" String="{i18n>Description}"/>
+                                                                                </Annotations>
+                                                                            </Schema>
+                                                                        </edmx:DataServices>
+                                                                    </edmx:Edmx>
