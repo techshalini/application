@@ -1,6 +1,6 @@
 using {my.dataModel as my} from '../db/schema';
 
- 
+ // all is well
 @requires: ['manager_scope', 'purchaser_scope']
 service EscalationManagementService {
 
