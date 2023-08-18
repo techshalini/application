@@ -108,6 +108,6 @@ parameters:
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-  - builder: custom
-    commands:
-    - npx cds build --production
+    - builder: custom
+      commands:
+        - npx -p @sap/cds-dk cds build --production
